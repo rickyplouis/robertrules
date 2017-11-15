@@ -22,7 +22,15 @@ export default class MakeRoom extends Component {
       confirmPassword: '',
       passwordProtected: false,
       duration: 0,
-      agenda: []
+      agenda: [],
+      timerObject: {
+        startingSeconds: 0,
+        secondsRemaining: 0,
+        percent: 100,
+        minutes: 0,
+        seconds: 0,
+        timerRunning: false
+      }
     }
     this.handleRoomName = this.handleRoomName.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -74,6 +82,7 @@ export default class MakeRoom extends Component {
       passwordProtected: this.state.passwordProtected,
       duration: this.state.duration,
       agenda: this.state.agenda,
+      timerObject: this.state.timerObject
     }
   }
 

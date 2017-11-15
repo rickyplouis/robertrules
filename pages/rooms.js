@@ -45,16 +45,6 @@ export default class RoomPage extends React.Component {
     this.socket.on('updateRoom', this.loadRooms)
   }
 
-  componentWillMount(){
-    this.setState({
-      timerObject: {
-        ...this.state.timerObject,
-        startingSeconds: timerController.convertTimeToSeconds(this.state.timerObject),
-        secondsRemaining: timerController.convertTimeToSeconds(this.state.timerObject)
-      }
-    })
-  }
-
   // close socket connection
   componentWillUnmount () {
     this.socket.off('updateRoom', this.loadRooms)
@@ -154,13 +144,21 @@ export default class RoomPage extends React.Component {
   setTimer = (timeObject) => {
     console.log('setTimer::timeObject', timeObject);
       this.setState({
-        timerObject: {
-          startingSeconds: timerController.convertTimeToSeconds(timeObject),
-          secondsRemaining: timerController.convertTimeToSeconds(timeObject),
-          percent: 100,
-          minutes: timeObject.minutes,
-          seconds: timeObject.seconds,
-          timerRunning: false
+        room: {
+          ...this.state.room,
+          timerObject: {
+            startingSeconds: timerController.convertTimeToSeconds(timeObject),
+            secondsRemaining: timerController.convertTimeToSeconds(timeObject),
+            percent: 100,
+            minutes: timeObject.minutes,
+            seconds: timeObject.seconds,
+            timerRunning: false
+          }
+        },
+        itemForm: {
+          details: "",
+          seconds: 0,
+          minutes: 0
         }
       })
   }
@@ -173,20 +171,41 @@ export default class RoomPage extends React.Component {
       ...this.state.itemForm,
       'name': this.state.username,
     }
-    this.setTimer(item);
-
     newAgenda[topicIndex].items.push(item);
-    this.setState({
-      room: {
-        ...this.state.room,
-        agenda: newAgenda,
-      },
-      itemForm: {
-        details: "",
-        seconds: 0,
-        minutes: 0
-      }
-    })
+
+    if (this.state.room.timerObject.startingSeconds == 0){
+      this.setState({
+        room: {
+          ...this.state.room,
+          agenda: newAgenda,
+          timerObject: {
+            startingSeconds: timerController.convertTimeToSeconds(item),
+            secondsRemaining: timerController.convertTimeToSeconds(item),
+            percent: 100,
+            minutes: item.minutes,
+            seconds: item.seconds,
+            timerRunning: false
+          }
+        },
+        itemForm: {
+          details: "",
+          seconds: 0,
+          minutes: 0
+        }
+      })
+    } else {
+      this.setState({
+        room: {
+          ...this.state.room,
+          agenda: newAgenda,
+        },
+        itemForm: {
+          details: "",
+          seconds: 0,
+          minutes: 0
+        }
+      })
+    }
   }
 
   submitItem = (event, topic) => {
@@ -304,27 +323,33 @@ export default class RoomPage extends React.Component {
 
 
   countDown() {
-    let seconds = this.state.timerObject.secondsRemaining - 1;
+    let seconds = this.state.room.timerObject.secondsRemaining - 1;
     if (seconds <= 0) {
       this.pauseTimer();
     }
 
     this.setState({
-      timerObject: {
-        ...this.state.timerObject,
-        secondsRemaining: seconds,
-        percent: (seconds / this.state.timerObject.startingSeconds) * 100
+      room: {
+        ...this.state.room,
+        timerObject: {
+          ...this.state.room.timerObject,
+          secondsRemaining: seconds,
+          percent: (seconds / this.state.room.timerObject.startingSeconds) * 100
+        }
       }
     })
   }
 
   startTimer() {
-    if (this.state.timerObject.secondsRemaining > 0 && !this.state.timerRunning){
+    if (this.state.room.timerObject.secondsRemaining > 0 && !this.state.room.timerRunning){
       this.timer = setInterval(this.countDown, 1000);
       this.setState({
-        timerObject: {
-          ...this.state.timerObject,
-          timerRunning: true
+        room: {
+          ...this.state.room,
+          timerObject: {
+            ...this.state.room.timerObject,
+            timerRunning: true
+          }
         }
       })
     }
@@ -333,15 +358,18 @@ export default class RoomPage extends React.Component {
   pauseTimer(){
     clearInterval(this.timer);
     this.setState({
-      timerObject: {
-        ...this.state.timerObject,
-        timerRunning: false
+      room:{
+        ...this.state.room,
+        timerObject: {
+          ...this.state.room.timerObject,
+          timerRunning: false
+        }
       }
     })
   }
 
   renderTimerButtons = () => {
-    return this.state.timerObject.timerRunning ?
+    return this.state.room.timerObject.timerRunning ?
           <Button onClick={this.pauseTimer} color='red'>Pause</Button>
           :
           <Button onClick={this.startTimer} color='blue'>Start</Button>
@@ -354,8 +382,8 @@ export default class RoomPage extends React.Component {
             <Card.Header>
               Current Speaker is {currentItem.name}
             </Card.Header>
-            <Header as='h4'>Time Remaining: {timerController.displayMinutes(this.state.timerObject.secondsRemaining)}:{timerController.displaySeconds(this.state.timerObject.secondsRemaining)}</Header>
-            <Progress percent={this.state.timerObject.percent} indicating size={'tiny'} style={{width: '50vw'}} />
+            <Header as='h4'>Time Remaining: {timerController.displayMinutes(this.state.room.timerObject.secondsRemaining)}:{timerController.displaySeconds(this.state.room.timerObject.secondsRemaining)}</Header>
+            <Progress percent={this.state.room.timerObject.percent} indicating size={'tiny'} style={{width: '50vw'}} />
             {this.renderTimerButtons()}
             <Button onClick={this.handleQueue} color="purple">Skip Speaker</Button>
           </div>
