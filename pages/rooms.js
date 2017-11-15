@@ -115,7 +115,12 @@ export default class RoomPage extends React.Component {
 
   handleQueue = () => {
     if (this.agendaExists(this.state.room.agenda)){
-      shiftAgenda(this.state.room.agenda).then( (newAgenda) => this.updateAgenda(newAgenda))
+      shiftAgenda(this.state.room.agenda).then( (newAgenda) => {
+        if (newAgenda[0] && newAgenda[0].items[0]){
+          this.setTimer(newAgenda[0].items[0])
+        }
+        this.updateAgenda(newAgenda)
+      })
     }
   }
 
@@ -141,26 +146,25 @@ export default class RoomPage extends React.Component {
     })
   }
 
-  setTimer = (timeObject) => {
-    console.log('setTimer::timeObject', timeObject);
-      this.setState({
-        room: {
-          ...this.state.room,
-          timerObject: {
-            startingSeconds: timerController.convertTimeToSeconds(timeObject),
-            secondsRemaining: timerController.convertTimeToSeconds(timeObject),
-            percent: 100,
-            minutes: timeObject.minutes,
-            seconds: timeObject.seconds,
-            timerRunning: false
-          }
-        },
-        itemForm: {
-          details: "",
-          seconds: 0,
-          minutes: 0
+  setTimer = (timeObject = { minutes: 0, seconds: 0}) => {
+    this.setState({
+      room: {
+        ...this.state.room,
+        timerObject: {
+          startingSeconds: timerController.convertTimeToSeconds(timeObject),
+          secondsRemaining: timerController.convertTimeToSeconds(timeObject),
+          percent: 100,
+          minutes: timeObject.minutes,
+          seconds: timeObject.seconds,
+          timerRunning: false
         }
-      })
+      },
+      itemForm: {
+        details: "",
+        seconds: 0,
+        minutes: 0
+      }
+    })
   }
 
   addItem = (event, topic) => {
