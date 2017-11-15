@@ -97,8 +97,8 @@ export default class RoomPage extends React.Component {
         startingSeconds: 0,
         secondsRemaining: 0,
         percent: 100,
-        minutes: 2,
-        seconds: 5,
+        minutes: 0,
+        seconds: 0,
         timerRunning: false
       }
     }
@@ -151,6 +151,20 @@ export default class RoomPage extends React.Component {
     })
   }
 
+  setTimer = (timeObject) => {
+    console.log('setTimer::timeObject', timeObject);
+      this.setState({
+        timerObject: {
+          startingSeconds: timerController.convertTimeToSeconds(timeObject),
+          secondsRemaining: timerController.convertTimeToSeconds(timeObject),
+          percent: 100,
+          minutes: timeObject.minutes,
+          seconds: timeObject.seconds,
+          timerRunning: false
+        }
+      })
+  }
+
   addItem = (event, topic) => {
     event.preventDefault();
     let topicIndex = findTopicIndex(topic, this.state.room.agenda);
@@ -159,6 +173,7 @@ export default class RoomPage extends React.Component {
       ...this.state.itemForm,
       'name': this.state.username,
     }
+    this.setTimer(item);
 
     newAgenda[topicIndex].items.push(item);
     this.setState({
@@ -330,19 +345,6 @@ export default class RoomPage extends React.Component {
           <Button onClick={this.pauseTimer} color='red'>Pause</Button>
           :
           <Button onClick={this.startTimer} color='blue'>Start</Button>
-  }
-
-  setTimer = (timeObject) => {
-      this.setState({
-        timerObject: {
-          startingSeconds: timerController.convertTimeToSeconds(timeObject),
-          secondsRemaining: timerController.convertTimeToSeconds(timeObject),
-          percent: 100,
-          minutes: timeObject.minutes,
-          seconds: timeObject.seconds,
-          timerRunning: true
-        }
-      })
   }
 
   renderTimer = () => {

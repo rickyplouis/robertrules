@@ -1,12 +1,14 @@
-export function displaySeconds(seconds){
-  seconds = seconds % 60;
+export function displaySeconds(inputSeconds){
+  let seconds = inputSeconds % 60;
   return seconds < 10 ? '0' + seconds : seconds;
 }
 
 export function displayMinutes(seconds){
-  return Math.floor(seconds / 60);
+  return Math.floor( seconds / 60);
 }
 
 export function convertTimeToSeconds(timerObject){
-  return timerObject.minutes * 60 + timerObject.seconds
+  let minutes = parseInt(timerObject.minutes || 0);
+  let seconds = parseInt(timerObject.seconds || 0);
+  return minutes * 60 + seconds;
 }
