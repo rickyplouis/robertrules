@@ -141,30 +141,13 @@ export default class RoomPage extends React.Component {
     deleteTopic(e, topic, agenda).then( (newAgenda) => this.updateAgenda(newAgenda) )
   }
 
-  handleItemDetails = (event) => {
+  handleItemForm = (event) => {
     event.preventDefault();
-    let newItem = this.state.itemForm;
-    newItem.details = event.target.value
     this.setState({
-      itemForm: newItem
-    })
-  }
-
-  handleItemMinutes = (event) => {
-    event.preventDefault();
-    let newItem = this.state.itemForm;
-    newItem.minutes = event.target.value
-    this.setState({
-      itemForm: newItem
-    })
-  }
-
-  handleItemSeconds = (event) => {
-    event.preventDefault();
-    let newItem = this.state.itemForm;
-    newItem.seconds = event.target.value
-    this.setState({
-      itemForm: newItem
+      itemForm: {
+        ...this.state.itemForm,
+        [event.target.name]: event.target.value
+      },
     })
   }
 
@@ -206,9 +189,9 @@ export default class RoomPage extends React.Component {
     return (
         <Form size={'tiny'} onSubmit={(e) => this.submitItem(e, topic)}>
           <Form.Group>
-            <Form.Input label="I will talk about..." placeholder='How we will create a product roadmap' width={'six'} name='details' value={this.state.itemForm.details} onChange={this.handleItemDetails} />
-            <Form.Input label="Minutes" width={'three'} type='number' placeholder='Amount' name='minutes' value={this.state.itemForm.minutes}  onChange={this.handleItemMinutes}/>
-            <Form.Input label="Seconds" width={'three'} type='number' placeholder='Amount' name='seconds' value={this.state.itemForm.seconds}  onChange={this.handleItemSeconds}/>
+            <Form.Input label="I will talk about..." placeholder='How we will create a product roadmap' width={'six'} name='details' value={this.state.itemForm.details} onChange={this.handleItemForm} />
+            <Form.Input label="Minutes" width={'three'} type='number' placeholder='Amount' name='minutes' value={this.state.itemForm.minutes}  onChange={this.handleItemForm}/>
+            <Form.Input label="Seconds" width={'three'} type='number' placeholder='Amount' name='seconds' value={this.state.itemForm.seconds}  onChange={this.handleItemForm}/>
             <Form.Button label="Submit" content='Submit' disabled={this.itemFormInvalid()} />
           </Form.Group>
         </Form>
