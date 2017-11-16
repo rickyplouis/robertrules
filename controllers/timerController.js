@@ -8,7 +8,7 @@ export function displayMinutes(seconds){
 }
 
 export function convertTimeToSeconds(timerObject={minutes: 0, seconds:0}){
-  let minutes = parseInt(timerObject.minutes || 0);
-  let seconds = parseInt(timerObject.seconds || 0);
+  let minutes = Math.abs(parseInt(timerObject.minutes || 0));
+  let seconds = Math.abs(parseInt(timerObject.seconds || 0));
   return minutes * 60 + seconds;
 }
