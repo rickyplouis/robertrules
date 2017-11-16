@@ -16,7 +16,7 @@
     "uuid": "^3.1.0"
   },
   "scripts": {
-    "test": "mocha --compilers js:babel-core/register ./tests/*.spec.js",
+    "test": "mocha ./tests/*.spec.js",
     "dev": "node server.js",
     "build": "next build",
     "start": "NODE_ENV=production node server.js"
