@@ -1,6 +1,9 @@
-const uuidv1 = require('uuid/v1');
+var uuidv1 = require('uuid/v1');
 
-export function findTopicIndex (topic, agenda) {
+
+//NOTE: Seperated this function from object because
+//promises don't allow 'this' notation to be used inside of them
+function findTopicIndex(topic, agenda){
   if (agenda.length == 0){
     return -1
   }
@@ -9,62 +12,66 @@ export function findTopicIndex (topic, agenda) {
       return x;
     }
   }
+  return -1;
 }
 
-export function deleteTopic(event, topic, agenda){
-  return new Promise(function(resolve, reject) {
+var agenda = {
+  deleteTopic(event, topic, agenda){
+    return new Promise(function(resolve, reject) {
+      event.preventDefault();
+      let index = findTopicIndex(topic, agenda);
+      let newAgenda = agenda;
+      newAgenda.splice(index, 1);
+      resolve(newAgenda);
+    });
+  },
+  changeName(event, topic, agenda){
+    return new Promise(function(resolve, reject) {
+      event.preventDefault();
+      let newAgenda = agenda;
+      newAgenda[findTopicIndex(topic, agenda)].name = event.target.value
+      resolve(newAgenda)
+    });
+  },
+  changeEditStatus(event, topic, agenda){
+    return new Promise(function(resolve, reject) {
+      event.preventDefault();
+      let newAgenda = agenda;
+      let index = findTopicIndex(topic, agenda);
+      newAgenda[index].editable = !newAgenda[index].editable
+      resolve(newAgenda)
+    });
+  },
+  shiftAgenda(agenda){
+    return new Promise(function(resolve, reject) {
+      let newAgenda = agenda;
+      //if agenda topic has items under it then shift items
+      if (newAgenda[0].items.length > 1){
+        newAgenda[0].items.shift();
+      //else shift agenda topic completely
+      } else {
+        newAgenda.shift();
+      }
+      resolve(newAgenda)
+    });
+  },
+  addTopic(event, topicName, agenda){
     event.preventDefault();
-    let index = findTopicIndex(topic, agenda);
-    let newAgenda = agenda;
-    newAgenda.splice(index, 1);
-    resolve(newAgenda);
-  });
+    return new Promise(function(resolve, reject) {
+      let topic = {
+        'id': uuidv1(),
+        'name': topicName,
+        'editable': false,
+        'items': []
+      }
+      let index = findTopicIndex({}, agenda);
+      let newAgenda = agenda.concat(topic);
+      resolve(newAgenda);
+    })
+  },
 }
 
-export function changeName(event, topic, agenda){
-  return new Promise(function(resolve, reject) {
-    event.preventDefault();
-    let newAgenda = agenda;
-    let index = findTopicIndex(topic, agenda);
-    newAgenda[index].name = event.target.value
-    resolve(newAgenda)
-  });
-}
-
-export function changeEditStatus(event, topic, agenda){
-  return new Promise(function(resolve, reject) {
-    event.preventDefault();
-    let newAgenda = agenda;
-    let index = findTopicIndex(topic, agenda);
-    newAgenda[index].editable = !newAgenda[index].editable
-    resolve(newAgenda)
-  });
-}
-
-export function shiftAgenda(agenda){
-  return new Promise(function(resolve, reject) {
-    let newAgenda = agenda;
-    //if agenda topic has items under it then shift items
-    if (newAgenda[0].items.length > 1){
-      newAgenda[0].items.shift();
-    //else shift agenda topic completely
-    } else {
-      newAgenda.shift();
-    }
-    resolve(newAgenda)
-  });
-}
-
-export function addTopic(event, topicName, agenda){
-  event.preventDefault();
-  return new Promise(function(resolve, reject) {
-    let topic = {
-      'id': uuidv1(),
-      'name': topicName,
-      'editable': false,
-      'items': []
-    }
-    let newAgenda = agenda.concat(topic);
-    resolve(newAgenda);
-  });
+module.exports = {
+  agenda,
+  findTopicIndex,
 }

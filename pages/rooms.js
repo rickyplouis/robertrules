@@ -11,7 +11,7 @@ import { Header, Form, Button, Card, Feed, Icon, Input, Progress, Label, Radio }
 import SortableList from '../components/SortableList'
 import Head from 'next/head';
 
-import { findTopicIndex, addTopic, deleteTopic, changeName, changeEditStatus, shiftAgenda } from '../controllers/agendaController'
+import {findTopicIndex, agenda as agendaController} from '../controllers/agendaController'
 import * as timerController from '../controllers/timerController'
 
 export default class RoomPage extends React.Component {
@@ -115,7 +115,7 @@ export default class RoomPage extends React.Component {
 
   handleQueue = () => {
     if (this.agendaExists(this.state.room.agenda)){
-      shiftAgenda(this.state.room.agenda).then( (newAgenda) => {
+      agendaController.shiftAgenda(this.state.room.agenda).then( (newAgenda) => {
         if (newAgenda[0] && newAgenda[0].items[0]){
           this.setTimer(newAgenda[0].items[0])
         }
@@ -125,15 +125,15 @@ export default class RoomPage extends React.Component {
   }
 
   changeTopicName = (event, topic, agenda) => {
-    changeName(event, topic, agenda).then( (newAgenda) => this.updateAgenda(newAgenda) );
+    agendaController.changeName(event, topic, agenda).then( (newAgenda) => this.updateAgenda(newAgenda) );
   }
 
   editStatus = (event, topic, agenda) => {
-    changeEditStatus(event, topic, agenda).then( (newAgenda) => this.updateAgenda(newAgenda) );
+    agendaController.changeEditStatus(event, topic, agenda).then( (newAgenda) => this.updateAgenda(newAgenda) );
   }
 
   removeTopic = (e, topic, agenda) => {
-    deleteTopic(e, topic, agenda).then( (newAgenda) => this.updateAgenda(newAgenda) )
+    agendaController.deleteTopic(e, topic, agenda).then( (newAgenda) => this.updateAgenda(newAgenda) )
   }
 
   handleItemForm = (event) => {
@@ -292,7 +292,7 @@ export default class RoomPage extends React.Component {
 
   submitTopic = (event, topicName, agenda) => {
     event.preventDefault();
-    addTopic(event, topicName, agenda).then( (newAgenda) => {
+    agendaController.addTopic(event, topicName, agenda).then( (newAgenda) => {
       this.updateAgenda(newAgenda)})
   }
 
