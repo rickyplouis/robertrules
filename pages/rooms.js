@@ -328,48 +328,56 @@ export default class RoomPage extends React.Component {
 
   countDown() {
     let seconds = this.state.room.timerObject.secondsRemaining - 1;
-    if (seconds <= 0) {
-      this.pauseTimer();
-    }
-
-    this.setState({
-      room: {
-        ...this.state.room,
-        timerObject: {
-          ...this.state.room.timerObject,
-          secondsRemaining: seconds,
-          percent: (seconds / this.state.room.timerObject.startingSeconds) * 100
-        }
-      }
-    })
-  }
-
-  startTimer() {
-    if (this.state.room.timerObject.secondsRemaining > 0 && !this.state.room.timerRunning){
-      this.timer = setInterval(this.countDown, 1000);
+    if (seconds === 0){
+      this.handleQueue()
+    } else {
       this.setState({
         room: {
           ...this.state.room,
           timerObject: {
             ...this.state.room.timerObject,
-            timerRunning: true
+            secondsRemaining: seconds,
+            percent: (seconds / this.state.room.timerObject.startingSeconds) * 100
           }
         }
       })
+      this.socket.emit('updateRoom', this.state.room)
     }
   }
 
-  pauseTimer(){
-    clearInterval(this.timer);
-    this.setState({
-      room:{
-        ...this.state.room,
-        timerObject: {
-          ...this.state.room.timerObject,
-          timerRunning: false
-        }
-      }
-    })
+  startTimer() {
+    if (this.state.room.timerObject.secondsRemaining > 0 && !this.state.room.timerObject.timerRunning){
+      Promise.all([
+        this.timer = setInterval(this.countDown, 1000),
+        this.setState({
+          room: {
+            ...this.state.room,
+            timerObject: {
+              ...this.state.room.timerObject,
+              timerRunning: true
+            }
+          }
+        })
+      ]).then( () => this.socket.emit('updateRoom', this.state.room) )
+
+    }
+  }
+
+  pauseTimer = event => {
+    if (this.state.room.timerObject.timerRunning){
+      Promise.all([
+        clearInterval(this.timer),
+        this.setState({
+          room: {
+            ...this.state.room,
+            timerObject: {
+              ...this.state.room.timerObject,
+              timerRunning: false
+            }
+          }
+        })
+      ]).then( () => this.socket.emit('updateRoom', this.state.room))
+    }
   }
 
   renderTimerButtons = () => {
