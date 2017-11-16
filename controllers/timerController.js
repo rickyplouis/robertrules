@@ -1,11 +1,11 @@
 var timer = {
   displaySeconds(inputSeconds=0){
-    inputSeconds = this.cleanString(inputSeconds);
-    let seconds = inputSeconds % 60;
+    let seconds = this.cleanString(inputSeconds) % 60;
     return seconds < 10 ? '0' + seconds : seconds.toString();
   },
-  displayMinutes(seconds){
-    return Math.floor( seconds / 60);
+  displayMinutes(seconds=0){
+    seconds = this.cleanString(seconds);
+    return Math.floor( seconds / 60).toString();
   },
   convertTimeToSeconds(timerObject={minutes: 0, seconds:0}){
     let minutes = this.cleanString(timerObject.minutes || 0)

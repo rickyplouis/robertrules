@@ -26,7 +26,6 @@ var mockTimers = [
 
 describe('timer.spec.js', function(){
   describe('convertTimeToSeconds()', function() {
-
     it('should handle no input timer', function() {
       expect(timer.convertTimeToSeconds()).to.equal(0);
     })
@@ -65,7 +64,6 @@ describe('timer.spec.js', function(){
   })
 
   describe('displaySeconds()', function(){
-
     it('should display seconds', function(){
       expect(timer.displaySeconds(10)).to.equal('10');
     })
@@ -89,8 +87,39 @@ describe('timer.spec.js', function(){
     it('should handle text inputs', function(){
       expect(timer.displaySeconds('2')).to.equal('02');
     })
-
   })
 
+  describe('displayMinutes()', function(){
+    it('should display minutes', function(){
+      expect(timer.displayMinutes(120)).to.equal('2');
+    })
 
+    it('should handle single digits', function(){
+      expect(timer.displayMinutes(3)).to.equal('0');
+    })
+
+    it('should handle double digits', function(){
+      expect(timer.displayMinutes(30)).to.equal('0');
+    })
+
+    it('should handle large numbers', function(){
+      expect(timer.displayMinutes(1200)).to.equal('20');
+    })
+
+    it('should handle fractions', function(){
+      expect(timer.displayMinutes(120.2)).to.equal('2');
+    })
+
+    it('should handle negative inputs', function(){
+      expect(timer.displayMinutes(-120)).to.equal('2');
+    })
+
+    it('should handle no inputs', function(){
+      expect(timer.displayMinutes()).to.equal('0');
+    })
+
+    it('should handle text inputs', function(){
+      expect(timer.displayMinutes('120')).to.equal('2');
+    })
+  })
 });
