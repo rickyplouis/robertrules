@@ -25,31 +25,30 @@ var mockTimers = [
 ]
 
 describe('timer.spec.js', function(){
-
   describe('convertTimeToSeconds()', function() {
 
     it('should handle no input timer', function() {
-      expect(timer.convertTimeToSeconds()).to.equal(0)
+      expect(timer.convertTimeToSeconds()).to.equal(0);
     })
 
     it('should convert seconds to seconds', function() {
-      expect(timer.convertTimeToSeconds(mockTimers[0])).to.equal(30)
+      expect(timer.convertTimeToSeconds(mockTimers[0])).to.equal(30);
     })
 
     it('should convert minutes to seconds', function() {
-      expect(timer.convertTimeToSeconds(mockTimers[1])).to.equal(120)
+      expect(timer.convertTimeToSeconds(mockTimers[1])).to.equal(120);
     })
 
     it('should handle high input for minutes and seconds', function() {
-      expect(timer.convertTimeToSeconds(mockTimers[2])).to.equal(3300)
+      expect(timer.convertTimeToSeconds(mockTimers[2])).to.equal(3300);
     })
 
     it('should handle string inputs for minutes and seconds', function() {
-      expect(timer.convertTimeToSeconds(mockTimers[3])).to.equal(140)
+      expect(timer.convertTimeToSeconds(mockTimers[3])).to.equal(140);
     })
 
     it('should handle negative inputs for minutes and seconds', function() {
-      expect(timer.convertTimeToSeconds(mockTimers[4])).to.equal(130)
+      expect(timer.convertTimeToSeconds(mockTimers[4])).to.equal(130);
     })
 
     it('should handle missing seconds input', function() {
@@ -63,6 +62,34 @@ describe('timer.spec.js', function(){
     it('should handle fractions for minutes and seconds', function() {
       expect(timer.convertTimeToSeconds({minutes: 2.8, seconds: 60.9})).to.equal(180)
     })
+  })
+
+  describe('displaySeconds()', function(){
+
+    it('should display seconds', function(){
+      expect(timer.displaySeconds(10)).to.equal('10');
+    })
+
+    it('should handle single digits', function(){
+      expect(timer.displaySeconds(1)).to.equal('01');
+    })
+
+    it('should handle fractions', function(){
+      expect(timer.displaySeconds(10.2)).to.equal('10');
+    })
+
+    it('should handle negative inputs', function(){
+      expect(timer.displaySeconds(-8)).to.equal('08');
+    })
+
+    it('should handle no inputs', function(){
+      expect(timer.displaySeconds()).to.equal('00');
+    })
+
+    it('should handle text inputs', function(){
+      expect(timer.displaySeconds('2')).to.equal('02');
+    })
+
   })
 
 
