@@ -50,8 +50,7 @@ var agenda = {
       resolve(newAgenda)
     });
   },
-  addTopic(event, topicName, agenda){
-    event.preventDefault();
+  addTopic(topicName, agenda){
     return new Promise(function(resolve, reject) {
       let topic = {
         'id': uuidv1(),
@@ -59,9 +58,7 @@ var agenda = {
         'editable': false,
         'items': []
       }
-      let index = findTopicIndex({}, agenda);
-      let newAgenda = agenda.concat(topic);
-      resolve(newAgenda);
+      resolve(agenda.concat(topic));
     })
   },
 }

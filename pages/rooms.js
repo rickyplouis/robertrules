@@ -292,7 +292,7 @@ export default class RoomPage extends React.Component {
 
   submitTopic = (event, topicName, agenda) => {
     event.preventDefault();
-    agendaController.addTopic(event, topicName, agenda).then( (newAgenda) => {
+    agendaController.addTopic(topicName, agenda).then( (newAgenda) => {
       this.updateAgenda(newAgenda)})
   }
 
