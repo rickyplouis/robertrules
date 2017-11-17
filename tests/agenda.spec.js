@@ -1,6 +1,6 @@
 var expect = require('chai').expect;
 var controller = require('../controllers/agendaController')
-
+var addTopic = controller.agenda.addTopic
 var mockAgenda = [
   {
     'id': '312',
@@ -51,4 +51,22 @@ describe('agenda.sepc.js', function(){
       expect(controller.findTopicIndex(mockTopics[1], mockAgenda)).to.equal(-1)
     })
   })
+
+  describe('addTopic()', function(){
+    var newTopicName = 'something cool'
+    beforeEach(function(){
+      return addTopic(newTopicName, mockAgenda).then( function(newAgenda){
+        mockAgenda = newAgenda
+      })
+    })
+
+    it('should have added a topic', function(){
+      expect(mockAgenda.length).to.equal(4)
+    })
+
+    it('should have new topic with a specific name', function(){
+      expect(mockAgenda[3].name).to.equal(newTopicName);
+    })
+  })
+
 })
