@@ -24,42 +24,61 @@ var mockTimers = [
   }
 ]
 
+var conversionTests = [
+  {
+    'args': {},
+    'expected': 0,
+    'message': 'nothing'
+  },
+  {
+    'args': mockTimers[0],
+    'expected': 30,
+    'message': 'seconds'
+  },
+  {
+    'args': mockTimers[1],
+    'expected': 120,
+    'message': 'minutes'
+  },
+  {
+    'args': mockTimers[2],
+    'expected': 3300,
+    'message': 'high numbers'
+  },
+  {
+    'args': mockTimers[3],
+    'expected': 140,
+    'message': 'string inputs'
+  },
+  {
+    'args': mockTimers[4],
+    'expected': 130,
+    'message': 'negative numbers'
+  },
+  {
+    'args': {minutes:2},
+    'expected': 120,
+    'message': 'only minutes'
+  },
+  {
+    'args': {seconds: 68},
+    'expected': 68,
+    'message': 'only seconds'
+  },
+  {
+    'args': {minutes: 2.8, seconds: 60.9},
+    'expected': 180,
+    'message': 'fractions'
+  }
+]
+
 describe('timer.spec.js', function(){
   describe('convertTimeToSeconds()', function() {
-    it('should handle no input timer', function() {
-      expect(timer.convertTimeToSeconds()).to.equal(0);
-    })
 
-    it('should convert seconds to seconds', function() {
-      expect(timer.convertTimeToSeconds(mockTimers[0])).to.equal(30);
-    })
-
-    it('should convert minutes to seconds', function() {
-      expect(timer.convertTimeToSeconds(mockTimers[1])).to.equal(120);
-    })
-
-    it('should handle high input for minutes and seconds', function() {
-      expect(timer.convertTimeToSeconds(mockTimers[2])).to.equal(3300);
-    })
-
-    it('should handle string inputs for minutes and seconds', function() {
-      expect(timer.convertTimeToSeconds(mockTimers[3])).to.equal(140);
-    })
-
-    it('should handle negative inputs for minutes and seconds', function() {
-      expect(timer.convertTimeToSeconds(mockTimers[4])).to.equal(130);
-    })
-
-    it('should handle missing seconds input', function() {
-      expect(timer.convertTimeToSeconds({minutes:2})).to.equal(120);
-    })
-
-    it('should handle missing minutes input', function() {
-      expect(timer.convertTimeToSeconds({seconds:68})).to.equal(68);
-    })
-
-    it('should handle fractions for minutes and seconds', function() {
-      expect(timer.convertTimeToSeconds({minutes: 2.8, seconds: 60.9})).to.equal(180)
+    conversionTests.forEach( function(test){
+      it('should handle ' + test.message + ' as arguments', function(){
+        expect(timer.convertTimeToSeconds(test.args)).to.equal(test.expected);
+      })
     })
   })
 
