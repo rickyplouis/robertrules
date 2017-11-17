@@ -72,6 +72,34 @@ var conversionTests = [
   }
 ]
 
+var displaySecondsTests = [
+  {
+    'args': 10,
+    'expected': '10',
+    'message': 'double digit seconds'
+  },
+  {
+    'args': 2,
+    'expected': '02',
+    'message': 'single digit seconds'
+  },
+  {
+    'args': 10.2,
+    'expected': '10',
+    'message': 'fractions'
+  },
+  {
+    'args': -8,
+    'expected': '08',
+    'message': 'negative numbers'
+  },
+  {
+    'args': '2',
+    'expected': '02',
+    'message': 'string inputs'
+  },
+]
+
 describe('timer.spec.js', function(){
   describe('convertTimeToSeconds()', function() {
 
@@ -83,29 +111,17 @@ describe('timer.spec.js', function(){
   })
 
   describe('displaySeconds()', function(){
-    it('should display seconds', function(){
-      expect(timer.displaySeconds(10)).to.equal('10');
-    })
 
-    it('should handle single digits', function(){
-      expect(timer.displaySeconds(1)).to.equal('01');
-    })
-
-    it('should handle fractions', function(){
-      expect(timer.displaySeconds(10.2)).to.equal('10');
-    })
-
-    it('should handle negative inputs', function(){
-      expect(timer.displaySeconds(-8)).to.equal('08');
+    displaySecondsTests.forEach( function(test) {
+      it('should properly display' + test.message, function(){
+        expect(timer.displaySeconds(test.args)).to.equal(test.expected)
+      })
     })
 
     it('should handle no inputs', function(){
       expect(timer.displaySeconds()).to.equal('00');
     })
 
-    it('should handle text inputs', function(){
-      expect(timer.displaySeconds('2')).to.equal('02');
-    })
   })
 
   describe('displayMinutes()', function(){
