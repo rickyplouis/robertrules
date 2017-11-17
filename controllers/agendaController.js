@@ -1,18 +1,13 @@
 var uuidv1 = require('uuid/v1');
 
-
 //NOTE: Seperated this function from object because
 //promises don't allow 'this' notation to be used inside of them
-function findTopicIndex(topic, agenda){
-  if (agenda.length == 0){
-    return -1
+function findTopicIndex(topic={}, agenda=[]){
+
+  function matchesIndex(element) {
+    return element.id === topic.id;
   }
-  for (let x = 0; x < agenda.length; x++){
-    if (agenda[x].id == topic.id){
-      return x;
-    }
-  }
-  return -1;
+  return agenda.findIndex(matchesIndex);
 }
 
 var agenda = {
