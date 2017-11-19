@@ -1,29 +1,6 @@
 var expect = require('chai').expect;
 var timer = require('../controllers/timerController');
 
-var mockTimers = [
-  {
-    'minutes': 0,
-    'seconds': 30
-  },
-  {
-    'minutes': 2,
-    'seconds': 0
-  },
-  {
-    'minutes':50,
-    'seconds': 300
-  },
-  {
-    'minutes': '2',
-    'seconds': '20'
-  },
-  {
-    'minutes': -2,
-    'seconds': -10
-  }
-]
-
 var conversionTests = [
   {
     'args': {},
@@ -31,27 +8,27 @@ var conversionTests = [
     'message': 'nothing'
   },
   {
-    'args': mockTimers[0],
+    'args': { 'minutes': 0, 'seconds': 30 },
     'expected': 30,
     'message': 'seconds'
   },
   {
-    'args': mockTimers[1],
+    'args': { 'minutes': 2, 'seconds': 0 },
     'expected': 120,
     'message': 'minutes'
   },
   {
-    'args': mockTimers[2],
+    'args': { 'minutes':50, 'seconds': 300},
     'expected': 3300,
     'message': 'high numbers'
   },
   {
-    'args': mockTimers[3],
+    'args': { 'minutes': '2','seconds': '20'},
     'expected': 140,
     'message': 'string inputs'
   },
   {
-    'args': mockTimers[4],
+    'args': { 'minutes': -2, 'seconds': -10},
     'expected': 130,
     'message': 'negative numbers'
   },
