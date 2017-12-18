@@ -13,6 +13,7 @@ import Head from 'next/head';
 
 import {findTopicIndex, agenda as agendaController} from '../controllers/agendaController'
 import * as timerController from '../controllers/timerController'
+import ItemForm from '../components/itemForm'
 
 export default class RoomPage extends React.Component {
 
@@ -22,7 +23,7 @@ export default class RoomPage extends React.Component {
   }
 
   static async getInitialProps ({ query: { id } }) {
-    const appUrl = process.env.NODE_ENV !== 'production' ? 'http://localhost:3000/rooms' : 'https://robertrules.io/rooms';
+    const appUrl = process.env.NODE_ENV !== 'production' ? 'http://localhost:3000/rooms' : 'https://learnthechain.com/rooms';
     const response = await fetch(appUrl)
     const rooms = await response.json()
     return { rooms }
@@ -225,14 +226,14 @@ export default class RoomPage extends React.Component {
 
   renderItem = (topic) => {
     return (
-        <Form size={'tiny'} onSubmit={(e) => this.submitItem(e, topic)}>
-          <Form.Group>
-            <Form.Input label="I will talk about..." placeholder='How we will create a product roadmap' width={'six'} name='details' value={this.state.itemForm.details} onChange={this.handleItemForm} />
-            <Form.Input label="Minutes" width={'three'} type='number' placeholder='Amount' name='minutes' value={this.state.itemForm.minutes}  onChange={this.handleItemForm}/>
-            <Form.Input label="Seconds" width={'three'} type='number' placeholder='Amount' name='seconds' value={this.state.itemForm.seconds}  onChange={this.handleItemForm}/>
-            <Form.Button label="Submit" content='Submit' disabled={this.itemFormInvalid()} />
-          </Form.Group>
-        </Form>
+        <ItemForm
+          onSubmit={(e) => this.submitItem(e, topic)}
+          details={this.state.itemForm.details}
+          onChange={this.handleItemForm}
+          minutes={this.state.itemForm.minutes}
+          seconds={this.state.itemForm.seconds}
+          disabled={this.itemFormInvalid()}
+          />
     )
   }
 
@@ -316,7 +317,7 @@ export default class RoomPage extends React.Component {
   }
 
   roomIsEmpty = (room) => {
-    return Object.keys(room).length === 0 && room.constructor === Object
+    return JSON.stringify(room) === JSON.stringify({})
   }
 
    /*
