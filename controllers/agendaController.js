@@ -11,10 +11,8 @@ function findTopicIndex(topic={}, agenda=[]){
 }
 
 var agenda = {
-  deleteTopic(event, topic, agenda){
+  deleteTopic(index, agenda){
     return new Promise(function(resolve, reject) {
-      event.preventDefault();
-      let index = findTopicIndex(topic, agenda);
       let newAgenda = agenda;
       newAgenda.splice(index, 1);
       resolve(newAgenda);
@@ -28,9 +26,8 @@ var agenda = {
       resolve(newAgenda)
     });
   },
-  changeEditStatus(event, topic, agenda){
+  changeEditStatus(topic, agenda){
     return new Promise(function(resolve, reject) {
-      event.preventDefault();
       let newAgenda = agenda;
       let index = findTopicIndex(topic, agenda);
       newAgenda[index].editable = !newAgenda[index].editable

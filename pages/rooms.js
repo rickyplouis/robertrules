@@ -15,6 +15,71 @@ import {findTopicIndex, agenda as agendaController} from '../controllers/agendaC
 import * as timerController from '../controllers/timerController'
 import ItemForm from '../components/itemForm'
 
+
+
+  const EmptyRoom = () => (
+    <div>No room available at this id</div>
+  )
+
+  const ActiveRoom = (props) => (
+    props.userConnected ? <div>{props.renderRoom}</div> : <div>{props.renderEntranceForm}</div>
+  )
+
+
+  const AddTopicForm = (props) => (
+      <Card style={{margin: '0 auto', display: 'table', width: '50vw'}}>
+        <Card.Content>
+          <Form>
+            <label>Add Topic:</label>
+            <Form.Input type="text" value={props.inputTopic} onChange={props.onChange} />
+            <Button onClick={props.onClick}>Send</Button>
+          </Form>
+        </Card.Content>
+      </Card>
+  )
+
+  const TimerButtons = (props) => (
+    props.timerIsRunning ? <Button onClick={props.onPause} color={"red"}>Pause</Button> : <Button onClick={props.onStart} color={"blue"}>Start</Button>
+  )
+
+  const TopicHeader = (props) => (
+    <Card.Content>
+      <Card.Header>
+        {props.name + " "} <Button active={props.editable} onClick={props.onClick}>{props.content}</Button>
+      </Card.Header>
+    </Card.Content>
+  )
+
+    const EditForm = (props) => (
+      props.editable &&
+      <Card.Content extra>
+        <Form size={'large'} width={16}>
+          <Form.Field inline>
+            <label>Edit Topic:</label>
+            <Input placeholder="Enter Topic Title" value={props.name} onChange={props.onChange} ></Input>
+          </Form.Field>
+          <Form.Field>
+            <Button onClick={props.onClick}>Delete Topic</Button>
+          </Form.Field>
+        </Form>
+      </Card.Content>
+    )
+
+
+  const EntranceForm = (props) => (
+      <div style={{margin: '0 auto', display: 'table'}}>
+        {props.joinText}
+        <Form size={'tiny'} onSubmit={props.onSubmit} >
+          <Form.Group>
+            <Form.Input placeholder='Enter your name' name='username' value={props.username} onChange={props.onChange} />
+            {props.passwordField}
+            <Form.Button content='Submit' disabled={props.disabled} />
+          </Form.Group>
+        </Form>
+      </div>
+  )
+
+
 export default class RoomPage extends React.Component {
 
   componentWillReceiveProps(nextProps) {
@@ -130,11 +195,13 @@ export default class RoomPage extends React.Component {
   }
 
   editStatus = (event, topic, agenda) => {
-    agendaController.changeEditStatus(event, topic, agenda).then( (newAgenda) => this.updateAgenda(newAgenda) );
+    event.preventDefault()
+    agendaController.changeEditStatus(topic, agenda).then( (newAgenda) => this.updateAgenda(newAgenda) );
   }
 
-  removeTopic = (e, topic, agenda) => {
-    agendaController.deleteTopic(e, topic, agenda).then( (newAgenda) => this.updateAgenda(newAgenda) )
+  removeTopic = (evt, topic, agenda) => {
+    event.preventDefault()
+    agendaController.deleteTopic(topic, agenda).then( (newAgenda) => this.updateAgenda(newAgenda) )
   }
 
   handleItemForm = (event) => {
@@ -224,62 +291,32 @@ export default class RoomPage extends React.Component {
     return this.state.itemForm.details.length === 0 || (this.state.itemForm.seconds === 0 && this.state.itemForm.minutes === 0);
   }
 
-  renderItem = (topic) => {
-    return (
-        <ItemForm
-          onSubmit={(e) => this.submitItem(e, topic)}
-          details={this.state.itemForm.details}
-          onChange={this.handleItemForm}
-          minutes={this.state.itemForm.minutes}
-          seconds={this.state.itemForm.seconds}
-          disabled={this.itemFormInvalid()}
-          />
-    )
-  }
-
-  /**
-  *
-  * Topic Components
-  *
-  */
-
-  renderTopicHeader = (topic) => {
-    return (<div>
-              {topic.name+" "} <Button active={topic.editable} onClick={(e) => this.editStatus(e, topic, this.state.room.agenda)}>{topic.editable ? 'Finish': 'Edit'} </Button>
-            </div>)
-  }
-
-  renderEditForm = (topic) => {
-    return (
-      <Form size={'large'} width={16}>
-        <Form.Field inline>
-          <label>Edit Topic:</label>
-          <Input placeholder="Enter Topic Title" value={topic.name} onChange={(e) => this.changeTopicName(e, topic, this.state.room.agenda)} ></Input>
-        </Form.Field>
-        <Form.Field>
-          <Button onClick={(e) => this.removeTopic(e, topic, this.state.room.agenda)}>Delete Topic</Button>
-        </Form.Field>
-      </Form>
-    )
-  }
-
   renderTopics(){
     let index = 0;
-    return this.state.room.agenda.map( (topic) =>
+    return this.state.room.agenda.map( (topic, index) =>
             (<Card style={{margin: '0 auto', display: 'table', width: '50vw'}} key={index++}>
-              <Card.Content>
-                <Card.Header>
-                  {this.renderTopicHeader(topic)}
-                </Card.Header>
-              </Card.Content>
-              {topic.editable &&
-                <Card.Content extra>
-                  {this.renderEditForm(topic)}
-                </Card.Content>
-              }
+                <TopicHeader
+                  name={topic.name}
+                  editable={topic.editable}
+                  onClick={(e) => this.editStatus(e, topic, this.state.room.agenda)}
+                  content={topic.editable ? 'Finish' : 'Edit'}
+                  />
+                <EditForm
+                  name={topic.name}
+                  editable={topic.editable}
+                  onChange={(e) => this.changeTopicName(e, topic, this.state.room.agenda)}
+                  onClick={(e) => this.removeTopic(e, topic, this.state.room.agenda)}
+                  />
               <Card.Content>
                   <SortableList items={this.state.room.agenda[findTopicIndex(topic, this.state.room.agenda)].items} onSortEnd={this.onSortEnd} />
-                  {this.renderItem(topic)}
+                  <ItemForm
+                    onSubmit={(e) => this.submitItem(e, topic)}
+                    details={this.state.itemForm.details}
+                    onChange={this.handleItemForm}
+                    minutes={this.state.itemForm.minutes}
+                    seconds={this.state.itemForm.seconds}
+                    disabled={this.itemFormInvalid()}
+                  />
                 </Card.Content>
               </Card>))
               }
@@ -302,48 +339,27 @@ export default class RoomPage extends React.Component {
     this.socket.emit('updateRoom', this.state.room)
   }
 
-  renderAddTopicForm = () => {
-    return (
-      <Card style={{margin: '0 auto', display: 'table', width: '50vw'}}>
-        <Card.Content>
-          <Form>
-            <label>Add Topic:</label>
-            <Form.Input type="text" value={this.state.inputTopic} onChange={this.handleTopic} />
-            <Button onClick={(e) => this.submitTopic(e, this.state.inputTopic, this.state.room.agenda)}>Send</Button>
-          </Form>
-        </Card.Content>
-      </Card>
-    )
-  }
-
   roomIsEmpty = (room) => {
     return JSON.stringify(room) === JSON.stringify({})
   }
 
-   /*
-    *
-    * Timer Components
-    *
-    */
-
+  updateTimer = (seconds) => {
+    this.setState({
+      room: {
+        ...this.state.room,
+        timerObject: {
+          ...this.state.room.timerObject,
+          secondsRemaining: seconds,
+          percent: (seconds / this.state.room.timerObject.startingSeconds) * 100
+        }
+      }
+    })
+    this.socket.emit('updateRoom', this.state.room)
+  }
 
   countDown() {
     let seconds = this.state.room.timerObject.secondsRemaining - 1;
-    if (seconds === 0){
-      this.handleQueue()
-    } else {
-      this.setState({
-        room: {
-          ...this.state.room,
-          timerObject: {
-            ...this.state.room.timerObject,
-            secondsRemaining: seconds,
-            percent: (seconds / this.state.room.timerObject.startingSeconds) * 100
-          }
-        }
-      })
-      this.socket.emit('updateRoom', this.state.room)
-    }
+    return seconds === 0 ? this.handleQueue() : this.updateTimer(seconds)
   }
 
   startTimer() {
@@ -360,7 +376,6 @@ export default class RoomPage extends React.Component {
           }
         })
       ]).then( () => this.socket.emit('updateRoom', this.state.room) )
-
     }
   }
 
@@ -381,12 +396,6 @@ export default class RoomPage extends React.Component {
     }
   }
 
-  renderTimerButtons = () => {
-    return this.state.room.timerObject.timerRunning ?
-          <Button onClick={this.pauseTimer} color='red'>Pause</Button>
-          :
-          <Button onClick={this.startTimer} color='blue'>Start</Button>
-  }
 
   renderTimer = () => {
       let currentItem = this.state.room.agenda[0].items[0];
@@ -397,7 +406,11 @@ export default class RoomPage extends React.Component {
             </Card.Header>
             <Header as='h4'>Time Remaining: {timerController.displayMinutes(this.state.room.timerObject.secondsRemaining)}:{timerController.displaySeconds(this.state.room.timerObject.secondsRemaining)}</Header>
             <Progress percent={this.state.room.timerObject.percent} indicating size={'tiny'} style={{width: '50vw'}} />
-            {this.renderTimerButtons()}
+            <TimerButtons
+              timerIsRunning={this.state.room.timerObject.timerRunning}
+              onStart={this.startTimer}
+              onPause={this.pauseTimer}
+              />
             <Button onClick={this.handleQueue} color="purple">Skip Speaker</Button>
           </div>
         )
@@ -423,7 +436,11 @@ export default class RoomPage extends React.Component {
             {this.timerVisible() && this.renderTimer()}
           </Card>
           {this.renderTopics()}
-          {this.renderAddTopicForm()}
+          <AddTopicForm
+            inputTopic={this.state.inputTopic}
+            onChange={this.handleTopic}
+            onClick={(e) => this.submitTopic(e, this.state.inputTopic, this.state.room.agenda)}
+          />
           <Form onSubmit={this.handleSubmit}>
             <label>My username:</label>
             <Form.Input type="text" placeholder="Enter your name" name="username" value={this.state.username} onChange={ (e) => this.handleUserForm(e)} />
@@ -438,6 +455,7 @@ export default class RoomPage extends React.Component {
 
   connectUser = () => {
     this.setState({
+      ...this.state,
       userConnected: true
     })
   }
@@ -447,6 +465,7 @@ export default class RoomPage extends React.Component {
 
     if (this.state.room.passwordProtected && this.passwordMismatch()){
       this.setState({
+        ...this.state,
         wrongPassword: true,
         password: ''
       })
@@ -476,44 +495,38 @@ export default class RoomPage extends React.Component {
   }
 
   renderPasswordField = () => {
-    return (<div>
-            { this.roomHasPassword()
-              &&
-              <Form.Input placeholder='Enter the room password' type="password" error={this.state.wrongPassword && this.state.password.length == 0} name='password' value={this.state.password} onChange={ (e) => this.handleUserForm(e)}/>
-            }
-            </div>)
+    return this.roomHasPassword() && <Form.Input placeholder='Enter the room password' type="password" error={this.state.wrongPassword && this.state.password.length == 0} name='password' value={this.state.password} onChange={ (e) => this.handleUserForm(e)}/>
   }
-
   renderJoinText = () => {
-    return (<Header as="h2"> Enter your name{this.roomHasPassword() ? " and password ": " "}to join</Header>)
+    return <Header as="h2"> Enter your name{this.roomHasPassword() ? " and password ": " "}to join</Header>
   }
 
-  renderEntranceForm(){
-    return (
-      <div style={{margin: '0 auto', display: 'table'}}>
-        {this.renderJoinText()}
-        <Form size={'tiny'} onSubmit={(e) => this.submitEntranceForm(e)} >
-          <Form.Group>
-            <Form.Input placeholder='Enter your name' name='username' value={this.state.username} onChange={ (e) => this.handleUserForm(e)} />
-            {this.renderPasswordField()}
-            <Form.Button content='Submit' disabled={this.disableEntranceButton()} />
-          </Form.Group>
-        </Form>
-      </div>
 
+  renderEntranceForm = () => {
+    return (
+      <EntranceForm
+        joinText={this.renderJoinText()}
+        onSubmit={(e) => this.submitEntranceForm(e)}
+        username={this.state.username}
+        onChange={(e) => this.handleUserForm(e)}
+        passwordField={this.renderPasswordField()}
+        disabled={this.disableEntranceButton()}
+        />
     )
   }
 
-  renderPage (){
-    if (this.roomIsEmpty(this.state.room)){
-      return <div>No room available at this id</div>
-    }
-    else {
-      return this.state.userConnected ? <div>{this.renderRoom()}</div> : <div>{this.renderEntranceForm()}</div>
-    }
+  renderPage = () => {
+    return (
+      this.roomIsEmpty(this.state.room) ? <EmptyRoom/> :
+        <ActiveRoom
+          userConnected={this.state.userConnected}
+          renderRoom={this.renderRoom()}
+          renderEntranceForm={this.renderEntranceForm()}
+        />
+    )
   }
 
-  render(){
+  render = () =>{
     return(
       <PageContainer>
         <Head>
